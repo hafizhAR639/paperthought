@@ -1,6 +1,6 @@
 # PaperThought
 
-> Platform analisis penulisan akademik berbasis AI — evaluasi sitasi, koherensi, keselarasan, dan kesenjangan penelitian secara otomatis.
+Platform analisis penulisan akademik berbasis AI. Mengevaluasi kualitas sitasi, koherensi, keselarasan topik, dan kesenjangan penelitian per paragraf — kemudian menyajikan saran perbaikan yang dapat langsung direvisi.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org)
@@ -8,117 +8,137 @@
 
 ---
 
-## ✨ Fitur
+## Latar Belakang
 
-- 📄 **Upload makalah** — teks langsung, PDF, atau DOCX
-- 🤖 **Analisis AI** — menggunakan NVIDIA Nemotron via OpenRouter (gratis)
-- 📊 **4 metrik evaluasi** per paragraf:
-  - Kualitas Sitasi
-  - Koherensi
-  - Keselarasan dengan topik
-  - Kesenjangan Penelitian
-- ✏️ **Editor revisi** dengan saran inline per paragraf
-- 🔄 **Analisis ulang** setelah revisi untuk pantau progres
-- 🇮🇩 **Antarmuka Bahasa Indonesia**
+Mahasiswa dan peneliti kerap menyerahkan seluruh proses koreksi tulisan kepada AI, yang justru mengikis kemampuan berpikir kritis mereka sendiri. PaperThought dibangun dengan filosofi sebaliknya: AI berperan sebagai auditor yang mengekspos kelemahan tulisan, bukan sebagai penulis pengganti. Keputusan revisi sepenuhnya ada di tangan penulis.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer | Teknologi |
-|-------|-----------|
-| Frontend | React 18, TypeScript, Vite 5, Tailwind CSS |
-| Backend | Node.js, Express, TypeScript |
-| Database | PostgreSQL |
-| AI | NVIDIA Nemotron (`nvidia/nemotron-3-super-120b-a12b:free`) via [OpenRouter](https://openrouter.ai) |
-| Auth | JWT |
+| Layer    | Teknologi                                                                 |
+|----------|---------------------------------------------------------------------------|
+| Frontend | React 18, TypeScript, Vite 5, Tailwind CSS, Zustand                      |
+| Backend  | Node.js 18, Express 4, TypeScript                                         |
+| Database | PostgreSQL 14+                                                            |
+| AI       | NVIDIA Nemotron (`nvidia/nemotron-3-super-120b-a12b:free`) via OpenRouter |
+| Auth     | JWT (RS256)                                                               |
+| Testing  | Jest + ts-jest (backend), Vitest + Testing Library (frontend)             |
 
 ---
 
-## 🚀 Cara Menjalankan
+## Fitur
 
-Lihat panduan lengkap di **[RUNNING.md](./RUNNING.md)**.
+- Upload makalah dalam format teks biasa, PDF, atau DOCX.
+- Analisis per paragraf dengan empat metrik: kualitas sitasi, koherensi, keselarasan, dan kesenjangan penelitian.
+- Setiap masalah dilengkapi tingkat keparahan (kritis / mayor / minor) dan saran perbaikan konkret dalam Bahasa Indonesia.
+- Editor revisi inline dengan perbandingan teks asli dan revisi.
+- Rate-limit guard bawaan: jeda 4 detik antar request, cache hasil 30 menit, retry otomatis saat kena HTTP 429.
+- Fallback ke mock analyzer jika API tidak tersedia, sehingga server tidak pernah crash karena ketiadaan koneksi AI.
 
-### TL;DR
+---
+
+## Cara Menjalankan
+
+Panduan lengkap tersedia di [RUNNING.md](./RUNNING.md). Ringkasan:
 
 ```bash
-# 1. Install dependencies
+# Install semua dependencies (monorepo workspace)
 npm install
 
-# 2. Setup database (PostgreSQL lokal)
+# Setup PostgreSQL
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
 sudo -u postgres psql -c "CREATE DATABASE paperthought OWNER postgres;"
 npm --workspace=backend run db:migrate
-npm --workspace=backend run db:seed   # buat akun test
+npm --workspace=backend run db:seed
 
-# 3. Konfigurasi environment
+# Salin template environment dan isi OPENROUTER_API_KEY
 cp .env.example backend/.env
-# Edit backend/.env → isi OPENROUTER_API_KEY
 
-# 4. Jalankan (2 terminal)
-npm --workspace=backend run dev    # Terminal 1 → localhost:3001
-npm --workspace=frontend run dev   # Terminal 2 → localhost:3000
+# Jalankan di dua terminal terpisah
+npm --workspace=backend run dev    # API  → localhost:3001
+npm --workspace=frontend run dev   # UI   → localhost:3000
 ```
 
-Buka **http://localhost:3000** — login dengan `test@paperthought.dev` / `Test1234!`
+Akun test: `test@paperthought.dev` / `Test1234!`
 
 ---
 
-## 🔑 Environment Variables
+## Environment Variables
 
-Lihat [`.env.example`](./.env.example) untuk panduan konfigurasi.
+Lihat [`.env.example`](./.env.example) untuk daftar lengkap. Variabel kritis:
 
-| Variable | Deskripsi |
-|----------|-----------|
-| `DATABASE_URL` | URL koneksi PostgreSQL |
-| `JWT_SECRET` | Secret untuk JWT token |
-| `OPENROUTER_API_KEY` | API key dari [openrouter.ai](https://openrouter.ai/keys) (gratis) |
-| `OPENROUTER_MODEL` | Model AI (default: `nvidia/nemotron-3-super-120b-a12b:free`) |
+| Variable             | Keterangan                                                                |
+|----------------------|---------------------------------------------------------------------------|
+| `DATABASE_URL`       | Connection string PostgreSQL                                              |
+| `JWT_SECRET`         | Secret untuk signing JWT — ganti di production                           |
+| `OPENROUTER_API_KEY` | API key dari [openrouter.ai/keys](https://openrouter.ai/keys) (gratis)   |
+| `OPENROUTER_MODEL`   | Model AI, default `nvidia/nemotron-3-super-120b-a12b:free`               |
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ```bash
-npm --workspace=backend test           # 45 tests
-npm --workspace=frontend test -- --run # 32 tests
+npm --workspace=backend test           # 45 unit tests
+npm --workspace=frontend test -- --run # 32 component tests
 ```
+
+Semua test berjalan tanpa koneksi API maupun database nyata — backend menggunakan in-memory mock pool saat `NODE_ENV=test`, frontend menggunakan Vitest dengan jsdom.
 
 ---
 
-## 📁 Struktur Proyek
+## Struktur Proyek
 
 ```
-PaperThought/
-├── frontend/          # React + Vite + Tailwind
+.
+├── backend/
 │   └── src/
-│       ├── pages/     # AnalysisPage, DashboardPage, dll.
+│       ├── config/       # Environment, database pool
+│       ├── database/     # Migrasi dan seed
+│       ├── middleware/   # Auth JWT, error handler
+│       ├── routes/       # REST endpoints
+│       ├── services/     # aiService, analysisService
+│       └── utils/
+├── frontend/
+│   └── src/
 │       ├── components/
-│       └── services/
-├── backend/           # Express + TypeScript
-│   └── src/
-│       ├── routes/    # REST API endpoints
-│       ├── services/  # aiService, analysisService
-│       └── config/    # database, env config
-├── .env.example       # Template environment variables
-├── RUNNING.md         # Panduan lengkap menjalankan app
+│       ├── hooks/
+│       ├── pages/        # AnalysisPage, RevisionPage, dll.
+│       ├── services/
+│       └── store/        # Zustand slices
+├── .env.example
+├── RUNNING.md
 └── LICENSE
 ```
 
 ---
 
-## 💡 Inspirasi & Referensi
+## Catatan Arsitektur
 
-Proyek ini terinspirasi dari ide yang dibahas dalam TED Talk berikut:
+**Kenapa tidak menggunakan OpenAI SDK langsung?**
+`@openrouter/sdk` v0.12 adalah ESM-only. Menggunakan static import akan memutus Jest yang dikompilasi ke CommonJS via ts-jest. Solusinya adalah dynamic `import()` di dalam fungsi — import hanya terjadi saat runtime ketika API key tersedia, sehingga unit test tidak pernah menyentuh modul tersebut.
 
-> **"How to Stop AI from Killing Your Critical Thinking"**
-> — *Advait Sarkar* | TED
-> 🎥 https://www.youtube.com/watch?v=3lPnN8omdPA
+**Kenapa AI prompt dalam Bahasa Indonesia?**
+Model Nemotron menghasilkan respons yang lebih relevan dan kontekstual ketika instruksi diberikan dalam bahasa yang sama dengan tulisan yang dianalisis. Prompt berbahasa Inggris cenderung menghasilkan saran generik yang tidak sensitif terhadap konteks akademik lokal.
 
-Video tersebut membahas bagaimana AI seharusnya digunakan sebagai **alat bantu berpikir kritis**, bukan sebagai pengganti. PaperThought dibangun atas filosofi yang sama — AI menganalisis dan memberi saran, tetapi keputusan revisi dan penilaian kualitas tetap ada di tangan penulis.
+**Rate limiting pada free tier.**
+Free tier OpenRouter tidak mendokumentasikan limit secara eksplisit, tetapi dalam pengujian konsisten mengembalikan HTTP 429 setelah burst request. Guard yang diimplementasikan (4 detik jeda, cache MD5, backoff 60 detik pada 429) menjaga throughput di bawah ~15 req/menit — cukup untuk analisis 10 paragraf dalam sekitar 4 menit.
 
 ---
 
-## 📝 License
+## Inspirasi & Referensi
 
-[MIT](./LICENSE) © 2026 HafizhAkr
+Proyek ini terinspirasi dari ide yang dibahas dalam TED Talk berikut:
+
+> "How to Stop AI from Killing Your Critical Thinking"
+> — Advait Sarkar | TED
+> https://www.youtube.com/watch?v=3lPnN8omdPA
+
+Talk tersebut berargumen bahwa penggunaan AI yang tepat seharusnya mempertajam, bukan menggantikan, kemampuan berpikir kritis pengguna. PaperThought mencoba menerjemahkan argumen itu ke dalam produk yang konkret.
+
+---
+
+## License
+
+[MIT](./LICENSE) &copy; 2026 HafizhAkr
