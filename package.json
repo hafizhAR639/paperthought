@@ -1,0 +1,23 @@
+{
+  "name": "paperthought",
+  "version": "0.1.0",
+  "description": "Academic writing analysis platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install-all": "npm install --workspaces",
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces",
+    "test": "npm run test --workspaces",
+    "test:backend": "npm --workspace=backend test",
+    "test:frontend": "npm --workspace=frontend test",
+    "test:watch": "npm run test:watch --workspaces",
+    "frontend": "npm --workspace=frontend",
+    "backend": "npm --workspace=backend"
+  }
+}

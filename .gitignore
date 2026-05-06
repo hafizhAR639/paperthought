@@ -1,0 +1,54 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build outputs ────────────────────────────────────────────────────────────
+dist/
+build/
+.cache/
+*.tsbuildinfo
+
+# ─── Environment & secrets (NEVER commit these) ───────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+
+# ─── Uploads / user data ──────────────────────────────────────────────────────
+uploads/
+*.pdf
+*.docx
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.sw?
+
+# ─── Python virtualenv (backend/venv) ─────────────────────────────────────────
+backend/venv/
+__pycache__/
+*.pyc
+
+# ─── Misc junk files (from terminal accidents) ────────────────────────────────
+"leep 1"
+"leep 3"
+"of -i :3001"
+"t { Pool } = require('pg');"
+"ubprocess"
+"ult.stderr)"
+"ult.stdout)"
+"c -p tsconfig.json --noEmit"
