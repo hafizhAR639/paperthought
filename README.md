@@ -107,6 +107,18 @@ PaperThought/
 
 ---
 
+## 💡 Inspirasi & Referensi
+
+Proyek ini terinspirasi dari ide yang dibahas dalam TED Talk berikut:
+
+> **"How to Stop AI from Killing Your Critical Thinking"**
+> — *Advait Sarkar* | TED
+> 🎥 https://www.youtube.com/watch?v=3lPnN8omdPA
+
+Video tersebut membahas bagaimana AI seharusnya digunakan sebagai **alat bantu berpikir kritis**, bukan sebagai pengganti. PaperThought dibangun atas filosofi yang sama — AI menganalisis dan memberi saran, tetapi keputusan revisi dan penilaian kualitas tetap ada di tangan penulis.
+
+---
+
 ## 📝 License
 
 [MIT](./LICENSE) © 2026 HafizhAkr
